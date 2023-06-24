@@ -82,6 +82,7 @@ public class UserController {
             if(user == null){
                 //判断当前手机号对应的用户是否为新用户，如果是新用户就自动完成注册
                 user = new User();
+                user.setName("林之迷");
                 user.setPhone(phone);
                 user.setStatus(1);
                 userService.save(user);

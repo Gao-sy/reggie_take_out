@@ -70,6 +70,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper,Dish> implements Dis
     }
 
     @Override
+    @Transactional
     public void updateWithFlavor(DishDto dishDto) {
 
         //更新dish表基本信息
