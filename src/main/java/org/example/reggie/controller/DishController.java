@@ -1,6 +1,7 @@
 package org.example.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.example.reggie.common.R;
 import org.example.reggie.dto.DishDto;
@@ -122,7 +123,7 @@ public class DishController {
 
         dishService.updateWithFlavor(dishDto);
 
-        return R.success("新增菜品成功");
+        return R.success("修改菜品信息成功");
     }
 
     /**
@@ -185,4 +186,43 @@ public class DishController {
 
         return R.success(dishDtoList);
     }
+
+    /**
+     * 删除
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids){
+        log.info("ids ={}",ids);
+
+        dishService.removeWithFlavors(ids);
+
+        return R.success("菜品数据删除成功");
+    }
+
+
+    @PostMapping("/status/0")
+    public R<String> status0(@RequestParam List<Long> ids){
+        log.info("ids:{}",ids);
+        //条件构造器
+        LambdaUpdateWrapper<Dish> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.in(Dish::getId,ids);
+        updateWrapper.set(Dish::getStatus,0);
+        dishService.update(updateWrapper);
+        return R.success("菜品状态修改成功");
+    }
+
+    @PostMapping("/status/1")
+    public R<String> status1(@RequestParam List<Long> ids){
+        log.info("ids:{}",ids);
+        //条件构造器
+        LambdaUpdateWrapper<Dish> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.in(Dish::getId,ids);
+        updateWrapper.set(Dish::getStatus,1);
+        dishService.update(updateWrapper);
+        return R.success("菜品状态修改成功");
+    }
+
+
 }

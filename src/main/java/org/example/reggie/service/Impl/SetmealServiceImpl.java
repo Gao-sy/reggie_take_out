@@ -10,6 +10,7 @@ import org.example.reggie.mapper.SetmealMapper;
 import org.example.reggie.service.SetmealDishService;
 import org.example.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +46,47 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper,Setmeal> imple
     }
 
     @Override
+    public SetmealDto getByIdWithDish(Long id) {
+        //查询菜品基本信息，从setmeal表查询
+        Setmeal setmeal = this.getById(id);
+
+        SetmealDto setmealDto = new SetmealDto();
+        BeanUtils.copyProperties(setmeal,setmealDto);
+
+        //查询当前套餐对应的菜品信息，从setmeal_dish表查询
+        LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SetmealDish::getSetmealId,id);
+        List<SetmealDish> dishes = setmealDishService.list(queryWrapper);
+        setmealDto.setSetmealDishes(dishes);
+
+        return setmealDto;
+
+    }
+
+    @Override
+    @Transactional
+    public void updateWithDish(SetmealDto setmealDto) {
+
+        //更新setmeal表基本信息
+        this.updateById(setmealDto);
+
+        //清理当前套餐对应菜品数据---setmeal_dish表的delete操作
+        LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SetmealDish::getSetmealId,setmealDto.getId());
+        setmealDishService.remove(queryWrapper);
+
+        //添加当前提交过来的菜品数据---setmeal_dish表的insert操作
+        List<SetmealDish> dishes = setmealDto.getSetmealDishes();
+        dishes = dishes.stream().map((item) -> {
+            item.setSetmealId(setmealDto.getId());
+            return item;
+        }).collect(Collectors.toList());
+
+        setmealDishService.saveBatch(dishes);
+
+    }
+
+    @Override
     @Transactional
     public void removeWithDish(List<Long> ids) {
         //select   count(*) from setmeal where id in (1,2,3) and status = 1
@@ -67,7 +109,5 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper,Setmeal> imple
         lambdaQueryWrapper.in(SetmealDish::getSetmealId,ids);
         //删除关联表中的数据---setmeal_dish
         setmealDishService.remove(lambdaQueryWrapper);
-
-
     }
 }

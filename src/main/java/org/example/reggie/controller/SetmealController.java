@@ -1,6 +1,7 @@
 package org.example.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.example.reggie.common.R;
 import org.example.reggie.dto.SetmealDto;
@@ -120,5 +121,61 @@ public class SetmealController {
         queryWrapper.orderByDesc(Setmeal::getUpdateTime);
 
         return R.success(setmealService.list(queryWrapper));
+    }
+
+    @GetMapping("/{id}")
+    public R<SetmealDto> get(@PathVariable Long id){
+
+        SetmealDto setmealDto=setmealService.getByIdWithDish(id);
+
+        return R.success(setmealDto);
+    }
+
+    /**
+     * 修改套餐
+     * @param setmealDto
+     * @return
+     */
+    @PutMapping
+    public R<String> update(@RequestBody SetmealDto setmealDto){
+        log.info(setmealDto.toString());
+
+        setmealService.updateWithDish(setmealDto);
+
+        return R.success("修改套餐信息成功");
+    }
+
+    /**
+     * 批量禁用售卖状态
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/0")
+    public R<String> status0(@RequestParam List<Long> ids){
+
+        log.info("ids:{}",ids);
+        //条件构造器
+        LambdaUpdateWrapper<Setmeal> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.in(Setmeal::getId,ids);
+        updateWrapper.set(Setmeal::getStatus,0);
+        setmealService.update(updateWrapper);
+        return R.success("套餐售卖状态修改成功");
+    }
+
+    /**
+     * 批量启用售卖套餐
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/1")
+    public R<String> status1(@RequestParam List<Long> ids){
+
+        log.info("ids:{}",ids);
+        //条件构造器
+        LambdaUpdateWrapper<Setmeal> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.in(Setmeal::getId,ids);
+        updateWrapper.set(Setmeal::getStatus,1);
+        setmealService.update(updateWrapper);
+        return R.success("套餐售卖状态修改成功");
     }
 }
