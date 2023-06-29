@@ -11,10 +11,10 @@ spring:
       username: root
       password: 123
   redis:
-    host: r-2zeqcj2ibad1r8pa57.redis.rds.aliyuncs.com
+    host: reggie-project.redis.rds.aliyuncs.com
     port: 6379
     database: 0
-    username: reggie-project.redis.rds.aliyuncs.com
+    username: r-2zeqcj2ibad1r8pa57
     password: root@1234
     cache:
       redis:
