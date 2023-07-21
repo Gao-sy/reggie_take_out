@@ -37,7 +37,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   redis:
-    host: reggie-project.redis.rds.aliyuncs.com
+    host: java-project.redis.rds.aliyuncs.com
     port: 6379
     database: 0
     username: r-2zeqcj2ibad1r8pa57
